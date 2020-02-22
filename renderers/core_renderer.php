@@ -94,7 +94,7 @@ class theme_eguru_core_renderer extends theme_boost\output\core_renderer {
      * @return string HTML fragment.
      */
     public function user_menu($user = null, $withlinks = null) {
-        global $USER, $CFG;
+        global $USER, $PAGE, $CFG;
         require_once($CFG->dirroot . '/user/lib.php');
 
         if (is_null($user)) {
@@ -215,6 +215,18 @@ class theme_eguru_core_renderer extends theme_boost\output\core_renderer {
             'userbutton'
         );
 
+        //user permission to see profile links
+        $courseid = $PAGE->course->id;
+        $showprofilelinks = true;
+        if ($courseid == SITEID) {
+            $showprofilelinks = theme_eguru_is_admin_or_manager($user);
+        } else {
+            if (theme_eguru_is_user_role($courseid, theme_eguru_get_student_roles(), $user->id) || theme_eguru_is_user_role($courseid, theme_eguru_get_teacher_roles(), $user->id)) {
+                $showprofilelinks = false;
+            }
+        }
+
+
         // Create a divider (well, a filler).
         $divider = new action_menu_filler();
         $divider->primary = false;
@@ -264,7 +276,7 @@ class theme_eguru_core_renderer extends theme_boost\output\core_renderer {
                             array('class' => 'icon')
                         );
                         if (!empty($value->titleidentifier)) {
-                            if ($value->titleidentifier == "profile,moodle" || $value->titleidentifier == "preferences,moodle") {
+                            if (($value->titleidentifier == "profile,moodle" || $value->titleidentifier == "preferences,moodle") && $showprofilelinks == false) {
                                 $skipnextdivider = true;
                                 break;
                             } else {

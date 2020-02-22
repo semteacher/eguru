@@ -596,3 +596,40 @@ function theme_eguru_get_hexa($hexa, $opacity) {
         return "rgba($r, $g, $b, $opacity)";
     }
 }
+
+
+
+/**
+ * Methods to check if user has role
+ *
+ */
+
+function theme_eguru_is_admin_or_manager($user = null)
+{
+    $context = context_system::instance();
+    return has_capability('moodle/site:configview', $context, $user);
+}
+
+function theme_eguru_is_user_role($courseid, $roleid, $userid = 0) {
+    $roles = get_user_roles(context_course::instance($courseid), $userid, false);
+    foreach ($roles as $role) {
+        if (is_array($roleid)) {
+            if (in_array($role->roleid, $roleid)) {
+                return true;
+            }            
+        } else {
+            if ($role->roleid == $roleid) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function theme_eguru_get_teacher_roles() {
+    return array(3);
+}
+
+function theme_eguru_get_student_roles() {
+    return array(5);
+}
